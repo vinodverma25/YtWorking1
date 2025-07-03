@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}All Jobs - YouTube Shorts Generator{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-list me-2"></i>
+                All Processing Jobs
+            </h2>
+
+            {% if jobs %}
+                <div class="row">
+                    {% for job in jobs %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    {{ job.title[:50] + '...' if job.title and job.title|length > 50 else (job.title or 'Processing...') }}
+                                </h6>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ job.created_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                </p>
+                                <p class="card-text">
+                                    <small class="text-muted">
+                                        Quality: {{ job.video_quality }}<br>
+                                        Aspect Ratio: {{ job.aspect_ratio }}<br>
+                                        Shorts Count: {{ job.shorts_count }}
+                                    </small>
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{{ 'success' if job.status.value == 'completed' else 'primary' if job.status.value in ['pending', 'downloading', 'transcribing', 'analyzing', 'editing'] else 'danger' }}">
+                                        {{ job.status.value.title() }}
+                                    </span>
+                                    {% if job.status.value == 'completed' %}
+                                        <a href="{{ url_for('results', job_id=job.id) }}" class="btn btn-sm btn-outline-primary">
+                                            View Results
+                                        </a>
+                                    {% else %}
+                                        <a href="{{ url_for('process', job_id=job.id) }}" class="btn btn-sm btn-outline-secondary">
+                                            View Status
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4>No jobs found</h4>
+                    <p class="text-muted">Start by creating your first YouTube shorts!</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Create New Job
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
